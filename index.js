@@ -25,7 +25,8 @@ const resolvers = {
             return collectItems(customers)
         }, 
         customer(_, args){
-            return customers.find(cus => cus.name === args.name)
+            return customers.find((cus) => cus.name === args.name)
+            // to search customer by name
         }
     }
 }
