@@ -6,9 +6,9 @@ export const typeDefs = `#graphql
         length: Int
         sleeve: Int
     }
-    type Name {
-        name: String!
-    }
+    # type Name {
+    #     name: String!
+    # }
     type Contact {
         phone: Int
         email: String
@@ -27,7 +27,7 @@ export const typeDefs = `#graphql
 
     type Customer {
         id: ID!
-        name: Name!
+        name: String!
         contact: Contact
         items: [Item]
         measurement: Measurement
