@@ -6,6 +6,8 @@ import mongoose from "mongoose";
 
 import Tailor from "./models/dataModel.js";
 import Customer from "./models/dataModel.js";
+import Item from "./models/dataModel.js";
+import Measurement from "./models/dataModel.js";
 
 // const Tailor = require("./models/dataModel.js")
 
@@ -22,36 +24,95 @@ function collectItems(cus) {
     }
     return itemsArr
 }
+
+
+async function createCustomer(input) {
+    try {
+        // Create a new Contact document from the input
+        const contact = new Contact(input.contact);
+        await contact.save();
+
+        // Create a new Measurement document from the input
+        const measurement = new Measurement(input.measurement);
+        await measurement.save();
+
+        // Create a new Customer document using the input data
+        const customer = new Customer({
+            name: input.name,
+            contact: contact._id, // Reference to the Contact document
+            measurement: measurement._id, // Reference to the Measurement document
+        });
+
+        // Save the new Customer document
+        await customer.save();
+
+        return customer; // Return the newly created Customer document
+    } catch (error) {
+        throw new Error(`Failed to create customer: ${error.message}`);
+    }
+}
 const resolvers = {
     Query: {
-        customers: async (_, args) => {
-            // if(args.id === Tailor.id){
-                const tailor = Tailor.findById(args.id)
-                try {
-                    const customers = await tailor.find({});
-                    return customers;
-                } catch (error) {
-                    throw new Error('Failed to fetch customers');
-                }
-        // }
+        // customers: async (_, args) => {
+        //     // if(Tailor.findById(args.id)){
+        //         const tailor = await Tailor.findById(args.id)
+        //         console.log(tailor.customers.name)
+        //         // return Tailor
+        //         try {
+        //             // const customerss = await Customer.find({});
+        //             // console.log(customerss)
+        //             return tailor.customers.name ;
+        //         } catch (error) {
+        //             throw new Error('Failed to fetch customers');
+        //         }
+        // // }
             
-        },
-        items(){
-            return collectItems(customers)
-        }, 
-        customer(_, args){
-            if(args.id === Tailor.id){
-                return Tailor.customers.find((cus) => cus.name === args.name)
+        // },
+        // items(){
+        //     return collectItems(customers)
+        // }, 
+
+// MY OWN ABOVE
+
+        customers: async (parent, args) => {
+            if (args.id){
+                const cus = await Customer.find({ _id: args.id })
+                console.log(cus)
+                return cus
             }
-            // return Tailor.customers.find((cus) => cus.name === args.name)
+            return Customer.find({});
+        },
+
+
+
+        customer: async(parent, args) => {
+            // if(args.id === Tailor.id){
+                // const tailor =  await Tailor.find({parent: args.id})
+                // // const res = await tailor.customers
+                // console.log(tailor)
+                // const res = await tailor.customers.find(args.cus)
+                // // console.log(res)
+                // return res
+                // STOP
+                if (args.id){
+                    return Customer.findById(args.id);
+                }
+                if(args.name){
+                    return Customer.findOne({name: args.name });
+                }
+                return null 
+            // }
+            // return tailor.customers.find((cus) => cus.name === args.name)
             // to search customer by name
         }
     },
 
     Mutation: {
         async createCustomer (_, args){
-            const newCustomer = new Customer({name: args.name, phone: args.phone })
+            const newCustomer = new Customer({name: args.name, phone: args.phone });
+            await newCustomer.save()
             const findTailor = await Tailor.findByIdAndUpdate(args.id, { $push: {customers: newCustomer}})
+            // await findTailor.save()
             // .customers.push(newCustomer);
             console.log(`tailor is  ${findTailor}`)
             // const response = findTailor.
@@ -62,36 +123,30 @@ const resolvers = {
                 ...newCustomer._doc
                 
             }
-            
-            // const newCustomer = Tailor{
-            //     name: args.name,
-            //     phone: args.phone,
-            //     id: args.id
-            // });
-
-            // const response = await newCustomer.save();
-            // console.log(newCustomer);
-
-            // return {
-            //     id: response._id,
-            //     ...response._doc
-            // }
         },
+     
+// stat
+        // async createTailor (_, args){
+        //     const newTailor = new Tailor({
+        //         name: args.name 
+        //         // email: email
+        //     });
 
-        async createTailor (_, args){
-            const newTailor = new Tailor({
-                name: args.name 
-                // email: email
-            });
+        //     const response = await newTailor.save();
+        //     console.log(newTailor);
 
-            const response = await newTailor.save();
-            console.log(newTailor);
+        //     return {
+        //         id: response._id,
+        //         ...response._doc
+        //     }
+        // },
+// stop
 
-            return {
-                id: response._id,
-                ...response._doc
-            }
-        }
+createTailor: async (parent, args) => {
+    const tailor = new Tailor(args)
+    return tailor.save();
+}
+
     }
 }
 // server set up
@@ -121,7 +176,7 @@ mongoose
 const { url } = await startStandaloneServer(server, {
     listen: { port: port }
 })
-console.log( await url)
+// console.log( await url)
 
 console.log(`server is listening on port , ${port}`)
 

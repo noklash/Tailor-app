@@ -9,15 +9,15 @@ const MeasurementSchema = new Schema({
     sleeve: Number
 });
 
-const Measurement = model('Measurement', MeasurementSchema);
+export const Measurement = model('Measurement', MeasurementSchema);
 
-// const ContactSchema = new Schema({
-//     phone: Number,
-//     email: String,
-//     address: String
-// });
+const ContactSchema = new Schema({
+    phone: Number,
+    email: String,
+    address: String
+});
 
-// const Contact = model('Contact', ContactSchema);
+export const Contact = model('Contact', ContactSchema);
 
 
 const ItemSchema = new Schema({
@@ -33,7 +33,7 @@ const ItemSchema = new Schema({
     review: String
 });
 
-const Item = model('Item', ItemSchema);
+export const Item = model('Item', ItemSchema);
 
 const CustomerSchema = new Schema({
     name: String,

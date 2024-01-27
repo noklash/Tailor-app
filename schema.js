@@ -80,8 +80,8 @@ export const typeDefs = `#graphql
     }
 
     type Query {
-        customers(id: ID!): [Customer]
-        customer(name: String!, id: ID!): Customer
+        customers(id: ID!): [Customer!]!
+        customer(name: String, id: ID!, cus: ID): Customer
         items: [Item]
     }
     type Mutation {
